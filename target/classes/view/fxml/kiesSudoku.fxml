@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.kiesSudokuConroller"
+            prefHeight="-Infinity" prefWidth="-Infinity">
+    <Label alignment="CENTER" layoutY="40.0" prefHeight="54.0" prefWidth="900.0" text="Prlwytzkofsky College"/>
+
+    <Label alignment="CENTER" layoutY="84.0" prefHeight="29.0" prefWidth="900.0" text="Welkom bij de QuizMaster"/>
+
+</AnchorPane>

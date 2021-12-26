@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="-Infinity" prefWidth="-Infinity" xmlns="http://javafx.com/javafx/11.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.SudokuSolverController">
+   <children>
+      <GridPane fx:id="sudokuVeldGridPane" gridLinesVisible="true" layoutY="29.0">
+         <columnConstraints>
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+            <ColumnConstraints hgrow="ALWAYS" minWidth="10.0" percentWidth="11.111" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+            <RowConstraints minHeight="10.0" percentHeight="11.11111" vgrow="ALWAYS" />
+         </rowConstraints>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
+      </GridPane>
+      <Button fx:id="verwerkHiddenSet" layoutX="598.0" layoutY="967.0" onAction="#doVerwerkHiddenSet" prefHeight="25.0" prefWidth="121.0" text="verwerk hidden set" />
+      <Button fx:id="verwerkNakedSingles" layoutY="929.0" onAction="#doVerwerkNakedSingles" text="Verwerk naked Singles" />
+      <Button fx:id="vindHiddenSets" layoutX="598.0" layoutY="931.0" onAction="#doVindHiddenSets" text="vind hiddenSets" />
+      <ComboBox fx:id="hiddenSetComboBox" layoutX="699.0" layoutY="931.0" onAction="#doMarkeerHiddenSet" prefHeight="25.0" prefWidth="199.0" />
+      <Button fx:id="gaNaarLoginScherm" layoutY="2.0" onAction="#doGaNaarLoginScherm" text="Menu" />
+      <Button layoutX="349.0" layoutY="931.0" mnemonicParsing="false" onAction="#doVindNakedSets" text="Vind naked sets" />
+      <ComboBox fx:id="nakedSetComboBox" layoutX="441.0" layoutY="931.0" onAction="#doMarkeerNakedSet" onMouseDragOver="#doMarkeerNakedSet" prefWidth="150.0" />
+      <Button layoutX="399.0" layoutY="966.0" mnemonicParsing="false" onAction="#doVerwerkNakedSet" prefHeight="25.0" prefWidth="107.0" text="verwerk naked set" />
+      <Button layoutY="967.0" mnemonicParsing="false" onAction="#doSolveSudoku" text="Solve Sudoku" />
+      <Button layoutY="967.0" mnemonicParsing="false" onAction="#doCheckSudoku" text="Check oplossing" />
+      <ComboBox fx:id="blockComboBox" layoutX="203.0" layoutY="929.0" onAction="#doMarkeerBlock" prefWidth="150.0" />
+      <Button layoutX="136.0" layoutY="966.0" mnemonicParsing="false" onAction="#doVerWerkBlock" prefHeight="25.0" prefWidth="107.0" text="verwerk block" />
+      <Button layoutX="136.0" layoutY="929.0" mnemonicParsing="false" onAction="#doVindBlocks" text="Vind blocks" />
+   </children>
+</AnchorPane>
