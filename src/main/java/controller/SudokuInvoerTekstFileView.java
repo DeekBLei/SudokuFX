@@ -8,7 +8,7 @@ public class SudokuInvoerTekstFileView {
     public int[][] LoadText() throws IOException {
         int[][] sudokuOpgave = new int[9][9];
         Scanner scanner = new Scanner(System.in);
-        String path = "Y:\\MakeItWork\\Sudoku\\sudoku4.txt";
+        String path = "src/main/Resouces/sudoku4.txt";
 
 
         System.out.println("Voer het pad incl filenaam in: ");

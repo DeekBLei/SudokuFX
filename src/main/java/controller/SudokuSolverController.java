@@ -34,7 +34,7 @@ public class SudokuSolverController {
 
 
     private GridPane[] gridpanesMogelijkehedenViewArray = new GridPane[Constantes.NUMBER_OF_FIELS_IN_SUDOKUFIELD];
-    private Label[][] mogelijkehedenViewArray = new Label[Constantes.NUMBER_OF_FIELS_IN_SUDOKUFIELD][Constantes.NUMBER_OF_FIELS_IN_MOGELIJKHEDEN + 1];
+    private Label[][] mogelijkehedenViewArray = new Label[Constantes.NUMBER_OF_FIELS_IN_SUDOKUFIELD][Constantes.NUMBER_OF_FIELDS_IN_MOGELIJKHEDEN + 1];
 
     private Label[] oplossingenView = new Label[Constantes.NUMBER_OF_FIELS_IN_SUDOKUFIELD];
 

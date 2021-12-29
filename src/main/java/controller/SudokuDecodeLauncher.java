@@ -41,9 +41,9 @@ public class SudokuDecodeLauncher {
 
 
         //printMatrix(sudokuVeld.cells, 9);
-        System.out.println();
-        //SudokuSolver sudokuSolver = new SudokuSolver(sudokuVeld);
-        //sudokuSolver.solveSudoku();
+       // System.out.println();
+     // SudokuSolver sudokuSolver = new SudokuSolver(sudokuVeld);
+      //  sudokuSolver.solveSudoku();
 
         System.out.println();
 
