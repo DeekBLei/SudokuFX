@@ -11,7 +11,8 @@ public class SudokuSolver {
     private List<Set> hiddenSets;
     private List<Set> nakedSets;
     private List<Set> blocks;
-
+    private static final int MINIMUM_BLOCK_SIZE = 2;
+    private static final int MAXIMUM_BLOCK_SIZE = 3;
 
     public SudokuSolver(SudokuVeld sudokuVeld) {
         this.sudokuVeld = sudokuVeld;
@@ -77,11 +78,8 @@ public class SudokuSolver {
 
     public void losNakedSinglesOp() {
         for (int cellNr = 0; cellNr < 81; cellNr++) {
-
-
             Cell cell = sudokuVeld.getCellByNumber(cellNr);
             if (cell.getAantalmogelijkheden() == 1) {
-
                 //check welke waarde dat is
                 for (int mogelijkheid = 1; mogelijkheid < 10; mogelijkheid++) {
                     if (cell.getMogelijkheden()[mogelijkheid] == 1) {
@@ -90,7 +88,6 @@ public class SudokuSolver {
                         cell.wisMogelijkheid(mogelijkheid);
                     }
                 }
-
             }
         }
     }
@@ -140,9 +137,7 @@ public class SudokuSolver {
             if (!nakedSet.contains(cell)) {
                 for (Cell cellInNakedSet : nakedSet)
                     for (int mogelijkheid : cellInNakedSet.getMogelijkhedenWaardes()) {
-
                         cell.wisMogelijkheid(mogelijkheid);
-
                     }
             }
         }
@@ -159,49 +154,43 @@ public class SudokuSolver {
     }
 
     private void vindBlock(List<Cell> cells, int setGrootte) {
-        List<Cell>[] mogelijkheidFrequentie = vulmogelijkheidFrequentieArray(cells);
-        for (int mogelijkheid = 1; mogelijkheid < mogelijkheidFrequentie.length; mogelijkheid++) {
-            List<Cell> blockCandidate = mogelijkheidFrequentie[mogelijkheid];
-               boolean isRightSize = true;
-            if(blockCandidate.size()>3||blockCandidate.size()<2){
-                isRightSize = false;
-            }
-            int row = -1;
-            int col =-1 ;
-            if(isRightSize){
-               row =  blockCandidate.get(0).row;
-               col = blockCandidate.get(0).col;
-            }
-            boolean inOneRow = true;
-            boolean isOneCol = true;
-            for(Cell  cell : blockCandidate){
-                if(cell.row != row){
-                    inOneRow = false;
-                }
-                if(cell.col!= col){
-                    isOneCol = false;
-                }
-            }
-            if(isRightSize&& isOneCol){
-              voegSetToeAanLijst(new Set(blockCandidate, blockCandidate.size(),
-                      new ArrayList<Integer>(Arrays.asList(mogelijkheid)),
-                      SetType.BLOCK,sudokuVeld.geefColumn(blockCandidate.get(0).col) ));
-
-            }
-            if(isRightSize&& inOneRow){
-                voegSetToeAanLijst(new Set(blockCandidate, blockCandidate.size(),
-                        new ArrayList<Integer>(Arrays.asList(mogelijkheid)),
-                        SetType.BLOCK,sudokuVeld.geefRij(blockCandidate.get(0).row) ));
+        List<Cell>[] mogelijkheidFrequentieList = vulmogelijkheidFrequentieArray(cells);
+        for (int mogelijkheid = 1; mogelijkheid < mogelijkheidFrequentieList.length; mogelijkheid++) {
+            List<Cell> blockCandidate = mogelijkheidFrequentieList[mogelijkheid];
+            if (blockCandidate.size() == setGrootte) {
+                checkCandidateIsBlock(blockCandidate, mogelijkheid);
             }
         }
-
     }
-    private void wisWaardeInCells(List<Cell> cells, int mogelijkheid, List<Cell> excludeList ){
-        for(Cell cell : cells){
-            if(!excludeList.contains(cell))
-            cell.wisMogelijkheid(mogelijkheid);
+
+    private void checkCandidateIsBlock(List<Cell> blockCandidate, int mogelijkheid) {
+        java.util.Set<Integer> rowNumbers = blockCandidate.stream().map(b -> b.row).collect(Collectors.toSet());
+        java.util.Set<Integer> colNumbers = blockCandidate.stream().map(b -> b.col).collect(Collectors.toSet());
+        //LijstSize gelijk aan 1 betekend dat de cellen op 1 lijn liggen.
+        if (colNumbers.size() == 1) {
+            List<Cell> lineOfCells = sudokuVeld.geefColumn(blockCandidate.get(0).col);
+            saveSet(lineOfCells, blockCandidate, mogelijkheid);
+        }
+        if (rowNumbers.size() == 1) {
+            List<Cell> lineOfCells = sudokuVeld.geefRij(blockCandidate.get(0).row);
+            saveSet(lineOfCells, blockCandidate, mogelijkheid);
         }
     }
+
+    private void saveSet(List<Cell> lineOfCells, List<Cell> blockSet, int mogelijkheid) {
+        voegSetToeAanLijst(new Set(blockSet, blockSet.size(),
+                new ArrayList<>(List.of(mogelijkheid)),
+                SetType.BLOCK, lineOfCells));
+    }
+
+
+    private void wisWaardeInCells(List<Cell> cells, int mogelijkheid, List<Cell> excludeList) {
+        for (Cell cell : cells) {
+            if (!excludeList.contains(cell))
+                cell.wisMogelijkheid(mogelijkheid);
+        }
+    }
+
     private void getNakedSet(List<Cell> cells, int setGrootte) {
         List<List<Integer>> combinaties = genereerCombis(cells.size(), setGrootte);
         List<List<Cell>> cellCombinaties = genereerCellCombniaties(cells, combinaties);
@@ -288,9 +277,10 @@ public class SudokuSolver {
             verwerkHiddenSet(set);
         }
     }
-    public void verwerkBlock(Set set){
 
-            wisWaardeInCells(set.getSuperSet(), set.getWaardes().get(0), set.getCellsInSet());
+    public void verwerkBlock(Set set) {
+
+        wisWaardeInCells(set.getSuperSet(), set.getWaardes().get(0), set.getCellsInSet());
 
     }
 
@@ -299,6 +289,7 @@ public class SudokuSolver {
             verwerkNakedSet(set);
         }
     }
+
     public void verwerkNakedSet(Set set) {
         wisWaardeinCollectieCells(set.getSuperSet(), set.getCellsInSet());
         nakedSets.remove(set);
@@ -314,25 +305,27 @@ public class SudokuSolver {
             cell.setIsDeelVanSet(false);
         }
     }
+
     public List<Set> getHiddenSets() {
         for (int i = 0; i < Constantes.SIZE_OF_SUDOKUFIELD; i++) {
             for (int setGrootte = 2; setGrootte < 5; setGrootte++) {
-               vindHiddenSet(sudokuVeld.geefColumn(i), setGrootte);
-               vindHiddenSet(sudokuVeld.geefRij(i), setGrootte);
-               vindHiddenSet(sudokuVeld.geefBox(i), setGrootte);
+                vindHiddenSet(sudokuVeld.geefColumn(i), setGrootte);
+                vindHiddenSet(sudokuVeld.geefRij(i), setGrootte);
+                vindHiddenSet(sudokuVeld.geefBox(i), setGrootte);
             }
         }
         return hiddenSets;
     }
+
     public List<Set> getBlocks() {
         for (int i = 0; i < Constantes.SIZE_OF_SUDOKUFIELD; i++) {
             for (int setGrootte = 2; setGrootte < 4; setGrootte++) {
-
                 vindBlock(sudokuVeld.geefBox(i), setGrootte);
             }
         }
         return blocks;
     }
+
     private void voegSetToeAanLijst(Set set) {
         switch (set.getSetType()) {
             case HIDDEN_SET: {
@@ -343,7 +336,7 @@ public class SudokuSolver {
                 nakedSets.add(set);
                 break;
             }
-            case BLOCK:{
+            case BLOCK: {
                 blocks.add(set);
                 break;
             }
@@ -356,7 +349,7 @@ public class SudokuSolver {
     public List<Set> getNakedSets() {
         for (int i = 0; i < Constantes.SIZE_OF_SUDOKUFIELD; i++) {
             for (int setGrootte = 2; setGrootte < 5; setGrootte++) {
-               getNakedSet(sudokuVeld.geefColumn(i), setGrootte);
+                getNakedSet(sudokuVeld.geefColumn(i), setGrootte);
                 getNakedSet(sudokuVeld.geefRij(i), setGrootte);
                 getNakedSet(sudokuVeld.geefBox(i), setGrootte);
             }
@@ -371,8 +364,6 @@ public class SudokuSolver {
     public void clearNakedSets() {
         nakedSets.clear();
     }
-
-
 
 
     public void printRij(List<Cell> rij) {
