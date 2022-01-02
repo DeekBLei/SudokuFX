@@ -157,47 +157,35 @@ public class SudokuSolver {
     }
 
     private void vindBlock(List<Cell> cells, int setGrootte) {
-        List<Cell>[] mogelijkheidFrequentie = vulmogelijkheidFrequentieArray(cells);
-        for (int mogelijkheid = 1; mogelijkheid < mogelijkheidFrequentie.length; mogelijkheid++) {
-            List<Cell> blockCandidate = mogelijkheidFrequentie[mogelijkheid];
-               boolean isRightSize = true;
-            if(blockCandidate.size()>3||blockCandidate.size()<2){
-                isRightSize = false;
-            }
-            int row = -1;
-            int col =-1 ;
-            if(isRightSize){
-               row =  blockCandidate.get(0).row;
-               col = blockCandidate.get(0).col;
-            }
-            boolean inOneRow = true;
-            boolean isOneCol = true;
-            for(Cell  cell : blockCandidate){
-                if(cell.row != row){
-                    inOneRow = false;
-                }
-                if(cell.col!= col){
-                    isOneCol = false;
-                }
-            }
-            if(isRightSize&& isOneCol){
-              voegSetToeAanLijst(new Set(blockCandidate, blockCandidate.size(),
-                      new ArrayList<Integer>(Arrays.asList(mogelijkheid)),
-                      SetType.BLOCK,sudokuVeld.geefColumn(blockCandidate.get(0).col) ));
-
-            }
-            if(isRightSize&& inOneRow){
-                voegSetToeAanLijst(new Set(blockCandidate, blockCandidate.size(),
-                        new ArrayList<Integer>(Arrays.asList(mogelijkheid)),
-                        SetType.BLOCK,sudokuVeld.geefRij(blockCandidate.get(0).row) ));
+        List<Cell>[] mogelijkheidFrequentieList = vulmogelijkheidFrequentieArray(cells);
+        for (int mogelijkheid = 1; mogelijkheid < mogelijkheidFrequentieList.length; mogelijkheid++) {
+            List<Cell> blockCandidate = mogelijkheidFrequentieList[mogelijkheid];
+            if (blockCandidate.size() == setGrootte) {
+                checkCandidateIsBlock(blockCandidate, mogelijkheid);
             }
         }
+    }
+
+    private void checkCandidateIsBlock(List<Cell> blockCandidate, int mogelijkheid) {
+        java.util.Set<Integer> rowNumbers = blockCandidate.stream().map(b -> b.row).collect(Collectors.toSet());
+        java.util.Set<Integer> colNumbers = blockCandidate.stream().map(b -> b.col).collect(Collectors.toSet());
+        //LijstSize gelijk aan 1 betekend dat de cellen op 1 lijn liggen.
+        if (colNumbers.size() == 1) {
+            List<Cell> lineOfCells = sudokuVeld.geefColumn(blockCandidate.get(0).col);
+            saveSet(lineOfCells, blockCandidate, mogelijkheid);
+        }
+        if (rowNumbers.size() == 1) {
+            List<Cell> lineOfCells = sudokuVeld.geefRij(blockCandidate.get(0).row);
+            saveSet(lineOfCells, blockCandidate, mogelijkheid);
+        }
+    }
 
     private void saveSet(List<Cell> lineOfCells, List<Cell> blockSet, int mogelijkheid) {
-        voegSetToeAanLijst(new Set(blockSet, blockSet.size(),
-                new ArrayList<>(List.of(mogelijkheid)),
-                SetType.BLOCK, lineOfCells));
+        java.util.Set<Integer> mogelijkheden = new HashSet<>();
+        mogelijkheden.add(mogelijkheid);
+        voegSetToeAanLijst(new Set(blockSet, blockSet.size(), mogelijkheden, SetType.BLOCK, lineOfCells));
     }
+
     private void wisWaardeInCells(List<Cell> cells, int mogelijkheid, List<Cell> excludeList ){
         for(Cell cell : cells){
             if(!excludeList.contains(cell))
@@ -287,9 +275,7 @@ public class SudokuSolver {
     }
 
     public void verwerkBlock(Set set) {
-
-            wisWaardeInCells(set.getSuperSet(), set.getWaardes().get(0), set.getCellsInSet());
-
+    set.getWaardes().stream().findAny().ifPresent(integer -> wisWaardeInCells(set.getSuperSet(), integer, set.getCellsInSet()));
     }
 
     public void verwerkNakedSets() {
@@ -327,7 +313,6 @@ public class SudokuSolver {
     public List<Set> getBlocks() {
         for (int i = 0; i < Constantes.SIZE_OF_SUDOKUFIELD; i++) {
             for (int setGrootte = 2; setGrootte < 4; setGrootte++) {
-
                 vindBlock(sudokuVeld.geefBox(i), setGrootte);
             }
         }
