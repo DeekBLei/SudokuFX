@@ -5,13 +5,13 @@ import java.util.List;
 public class Set {
     private List<Cell> cellsInSet;
     private int setGrootte;
-    private List<Integer> waardes;
+    private java.util.Set<Integer> waardes;
     private SetType setType;
 
 
     private List<Cell> superSet;
 
-    public Set(List<Cell> cellsInSet, int setGrootte, List<Integer> waardes, SetType setType, List<Cell> superSet) {
+    public Set(List<Cell> cellsInSet, int setGrootte, java.util.Set<Integer> waardes, SetType setType, List<Cell> superSet) {
         this.cellsInSet = cellsInSet;
         this.setGrootte = setGrootte;
         this.waardes = waardes;
@@ -32,7 +32,7 @@ public class Set {
         return setType;
     }
 
-    public List<Integer> getWaardes() {
+    public java.util.Set<Integer> getWaardes() {
         return waardes;
     }
 

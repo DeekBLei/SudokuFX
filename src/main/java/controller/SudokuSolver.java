@@ -11,8 +11,7 @@ public class SudokuSolver {
     private List<Set> hiddenSets;
     private List<Set> nakedSets;
     private List<Set> blocks;
-    private static final int MINIMUM_BLOCK_SIZE = 2;
-    private static final int MAXIMUM_BLOCK_SIZE = 3;
+
 
     public SudokuSolver(SudokuVeld sudokuVeld) {
         this.sudokuVeld = sudokuVeld;
@@ -78,8 +77,11 @@ public class SudokuSolver {
 
     public void losNakedSinglesOp() {
         for (int cellNr = 0; cellNr < 81; cellNr++) {
+
+
             Cell cell = sudokuVeld.getCellByNumber(cellNr);
             if (cell.getAantalmogelijkheden() == 1) {
+
                 //check welke waarde dat is
                 for (int mogelijkheid = 1; mogelijkheid < 10; mogelijkheid++) {
                     if (cell.getMogelijkheden()[mogelijkheid] == 1) {
@@ -88,6 +90,7 @@ public class SudokuSolver {
                         cell.wisMogelijkheid(mogelijkheid);
                     }
                 }
+
             }
         }
     }
@@ -143,7 +146,7 @@ public class SudokuSolver {
         }
     }
 
-    public void wisWaardeinCellsBehalve(List<Cell> matchingSet, List<Integer> waardesInCombi) {
+    public void wisWaardeinCellsBehalve(List<Cell> matchingSet, java.util.Set<Integer> waardesInCombi) {
         for (Cell cell : matchingSet) {
             for (int i = 1; i < 10; i++) {
                 if (!waardesInCombi.contains(i)) {
@@ -154,72 +157,73 @@ public class SudokuSolver {
     }
 
     private void vindBlock(List<Cell> cells, int setGrootte) {
-        List<Cell>[] mogelijkheidFrequentieList = vulmogelijkheidFrequentieArray(cells);
-        for (int mogelijkheid = 1; mogelijkheid < mogelijkheidFrequentieList.length; mogelijkheid++) {
-            List<Cell> blockCandidate = mogelijkheidFrequentieList[mogelijkheid];
-            if (blockCandidate.size() == setGrootte) {
-                checkCandidateIsBlock(blockCandidate, mogelijkheid);
+        List<Cell>[] mogelijkheidFrequentie = vulmogelijkheidFrequentieArray(cells);
+        for (int mogelijkheid = 1; mogelijkheid < mogelijkheidFrequentie.length; mogelijkheid++) {
+            List<Cell> blockCandidate = mogelijkheidFrequentie[mogelijkheid];
+               boolean isRightSize = true;
+            if(blockCandidate.size()>3||blockCandidate.size()<2){
+                isRightSize = false;
+            }
+            int row = -1;
+            int col =-1 ;
+            if(isRightSize){
+               row =  blockCandidate.get(0).row;
+               col = blockCandidate.get(0).col;
+            }
+            boolean inOneRow = true;
+            boolean isOneCol = true;
+            for(Cell  cell : blockCandidate){
+                if(cell.row != row){
+                    inOneRow = false;
+                }
+                if(cell.col!= col){
+                    isOneCol = false;
+                }
+            }
+            if(isRightSize&& isOneCol){
+              voegSetToeAanLijst(new Set(blockCandidate, blockCandidate.size(),
+                      new ArrayList<Integer>(Arrays.asList(mogelijkheid)),
+                      SetType.BLOCK,sudokuVeld.geefColumn(blockCandidate.get(0).col) ));
+
+            }
+            if(isRightSize&& inOneRow){
+                voegSetToeAanLijst(new Set(blockCandidate, blockCandidate.size(),
+                        new ArrayList<Integer>(Arrays.asList(mogelijkheid)),
+                        SetType.BLOCK,sudokuVeld.geefRij(blockCandidate.get(0).row) ));
             }
         }
-    }
-
-    private void checkCandidateIsBlock(List<Cell> blockCandidate, int mogelijkheid) {
-        java.util.Set<Integer> rowNumbers = blockCandidate.stream().map(b -> b.row).collect(Collectors.toSet());
-        java.util.Set<Integer> colNumbers = blockCandidate.stream().map(b -> b.col).collect(Collectors.toSet());
-        //LijstSize gelijk aan 1 betekend dat de cellen op 1 lijn liggen.
-        if (colNumbers.size() == 1) {
-            List<Cell> lineOfCells = sudokuVeld.geefColumn(blockCandidate.get(0).col);
-            saveSet(lineOfCells, blockCandidate, mogelijkheid);
-        }
-        if (rowNumbers.size() == 1) {
-            List<Cell> lineOfCells = sudokuVeld.geefRij(blockCandidate.get(0).row);
-            saveSet(lineOfCells, blockCandidate, mogelijkheid);
-        }
-    }
 
     private void saveSet(List<Cell> lineOfCells, List<Cell> blockSet, int mogelijkheid) {
         voegSetToeAanLijst(new Set(blockSet, blockSet.size(),
                 new ArrayList<>(List.of(mogelijkheid)),
                 SetType.BLOCK, lineOfCells));
     }
-
-
-    private void wisWaardeInCells(List<Cell> cells, int mogelijkheid, List<Cell> excludeList) {
-        for (Cell cell : cells) {
-            if (!excludeList.contains(cell))
-                cell.wisMogelijkheid(mogelijkheid);
+    private void wisWaardeInCells(List<Cell> cells, int mogelijkheid, List<Cell> excludeList ){
+        for(Cell cell : cells){
+            if(!excludeList.contains(cell))
+            cell.wisMogelijkheid(mogelijkheid);
         }
     }
-
     private void getNakedSet(List<Cell> cells, int setGrootte) {
-        List<List<Integer>> combinaties = genereerCombis(cells.size(), setGrootte);
-        List<List<Cell>> cellCombinaties = genereerCellCombniaties(cells, combinaties);
-        int aantalOpgelosteCellen = 0;
-        for (Cell cell : cells) {
-            aantalOpgelosteCellen += cell.isOpgelost() ? 1 : 0;
-        }
-        if (setGrootte < Constantes.NUMBER_OF_FIELS_IN_MOGELIJKHEDEN - aantalOpgelosteCellen) {
+        if (isSetSmalllerThanNumberOfUnSolvedCells(setGrootte, cells)) {
+            List<List<Cell>> cellCombinaties = genereerCellCombniaties(cells, setGrootte);
             for (List<Cell> cellCombi : cellCombinaties) {
-                List<Integer> waardes = new ArrayList<>();
-                boolean combiGeldig = true;
+                java.util.Set<Integer> waardes = new HashSet<>();
                 for (Cell cell : cellCombi) {
-                    if (!cell.isOpgelost()) {
-                        List<Integer> waardesincell = cell.getMogelijkhedenWaardes();
-                        for (int waarde : waardesincell) {
-                            if (!waardes.contains(waarde)) {
-                                waardes.add(waarde);
-                            }
-                        }
-                    } else {
-                        combiGeldig = false;
+                    waardes.addAll(cell.getMogelijkhedenWaardes());
+                    if (waardes.size() == setGrootte) {
+                        voegSetToeAanLijst(new Set(cellCombi, setGrootte, waardes, SetType.NAKED_SET, cells));
                     }
-                }
-                if (waardes.size() == setGrootte && combiGeldig) {
-                    voegSetToeAanLijst(new Set(cellCombi, setGrootte, waardes, SetType.NAKED_SET, cells));
                 }
             }
         }
     }
+
+    private boolean isSetSmalllerThanNumberOfUnSolvedCells(int setGrootte, List<Cell> cells) {
+        int aantalOpgelosteCellen = cells.stream().filter(c -> c.isOpgelost()).toArray().length;
+        return setGrootte < (Constantes.NUMBER_OF_FIELDS_IN_MOGELIJKHEDEN - aantalOpgelosteCellen) / 2;
+    }
+
 
     private List<Cell>[] vulmogelijkheidFrequentieArray(List<Cell> cells) {
         List<Cell>[] mogelijkheidFrequentie = new ArrayList[10];
@@ -236,9 +240,9 @@ public class SudokuSolver {
         List<Cell>[] mogelijkheidFrequentie = vulmogelijkheidFrequentieArray(cells);
         //maak indexSets(groottte set == setGrootte) van de mogelijkheden
         //array.length == 10 omdat nul geen mogelijkheid is. Dus bij alle combis 1 bij de index optellen
-        List<List<Integer>> combis = genereerCombis(mogelijkheidFrequentie.length - 1, setGrootte);
+        List<java.util.Set<Integer>> combis = genereerAlleIndexCombis(mogelijkheidFrequentie.length - 1, setGrootte);
         tel1BijIndexenOp(combis);
-        for (List<Integer> waardeCombi : combis) {
+        for (java.util.Set<Integer> waardeCombi : combis) {
             List<Cell> totaalCellenInCombi = new ArrayList<>();
             boolean alleSetsInCombiNotNull = true;
             for (int i : waardeCombi) {
@@ -264,11 +268,15 @@ public class SudokuSolver {
         }
     }
 
-    public void tel1BijIndexenOp(List<List<Integer>> combis) {
-        for (List<Integer> combi : combis) {
-            for (int i = 0; i < combi.size(); i++) {
-                combi.set(i, combi.get(i) + 1);
+    public void tel1BijIndexenOp(List<java.util.Set<Integer>> combis) {
+
+        for (java.util.Set<Integer> combi : combis) {
+            java.util.Set<Integer> allesPlus1 = new HashSet<>();
+            for (Integer i : combi) {
+                allesPlus1.add(++i);
             }
+            combi.clear();
+            combi.addAll(allesPlus1);
         }
     }
 
@@ -280,7 +288,7 @@ public class SudokuSolver {
 
     public void verwerkBlock(Set set) {
 
-        wisWaardeInCells(set.getSuperSet(), set.getWaardes().get(0), set.getCellsInSet());
+            wisWaardeInCells(set.getSuperSet(), set.getWaardes().get(0), set.getCellsInSet());
 
     }
 
@@ -288,19 +296,18 @@ public class SudokuSolver {
         for (Set set : nakedSets) {
             verwerkNakedSet(set);
         }
+        nakedSets.clear();
     }
 
     public void verwerkNakedSet(Set set) {
         wisWaardeinCollectieCells(set.getSuperSet(), set.getCellsInSet());
-        nakedSets.remove(set);
-        for (Cell cell : set.getCellsInSet()) {
+                for (Cell cell : set.getCellsInSet()) {
             cell.setIsDeelVanSet(false);
         }
     }
 
     public void verwerkHiddenSet(Set set) {
         wisWaardeinCellsBehalve(set.getCellsInSet(), set.getWaardes());
-        hiddenSets.remove(set);
         for (Cell cell : set.getCellsInSet()) {
             cell.setIsDeelVanSet(false);
         }
@@ -320,6 +327,7 @@ public class SudokuSolver {
     public List<Set> getBlocks() {
         for (int i = 0; i < Constantes.SIZE_OF_SUDOKUFIELD; i++) {
             for (int setGrootte = 2; setGrootte < 4; setGrootte++) {
+
                 vindBlock(sudokuVeld.geefBox(i), setGrootte);
             }
         }
@@ -408,33 +416,46 @@ public class SudokuSolver {
         }
     }
 
-    private List<List<Cell>> genereerCellCombniaties(List<Cell> cells, List<List<Integer>> combinaties) {
+    private List<List<Cell>> genereerCellCombniaties(List<Cell> cells, int setGrootte) {
+        List<java.util.Set<Integer>> combinaties = genereerAlleIndexCombis(cells.size(), setGrootte);
         List<List<Cell>> cellCombinaties = new ArrayList<>();
-        for (List<Integer> indexcombi : combinaties) {
-            List<Cell> cellCombinatie = new ArrayList<>();
-            for (int i : indexcombi) {
-                cellCombinatie.add(cells.get(i));
+        for (java.util.Set<Integer> indexCombi : combinaties) {
+            List<Cell> cellCombinatie = genereerCellCombinatie(indexCombi, cells);
+            if (cellCombinatie != null) {
+                cellCombinaties.add(cellCombinatie);
             }
-            cellCombinaties.add(cellCombinatie);
         }
         return cellCombinaties;
     }
 
-    private static List<List<Integer>> genereerCombis(int verzamelingGrootte, int setGrootte) {
-        List<List<Integer>> combinaties = new ArrayList<>();
+    private List<Cell> genereerCellCombinatie(java.util.Set<Integer> indexcombi, List<Cell> cells) {
+        List<Cell> cellCombinatie = new ArrayList<>();
+        for (int i : indexcombi) {
+            if (cells.get(i).isOpgelost()) {
+                cellCombinatie =null;
+                break;
+            }
+            cellCombinatie.add(cells.get(i));
+        }
+        return cellCombinatie;
+    }
+
+
+    private static List<java.util.Set<Integer>> genereerAlleIndexCombis(int verzamelingGrootte, int setGrootte) {
+        List<java.util.Set<Integer>> combinaties = new ArrayList<>();
         permuteCombis(combinaties, new ArrayList<>(), verzamelingGrootte, setGrootte);
         return combinaties;
     }
 
-    private static void permuteCombis(List<List<Integer>> combis, List<Integer> soFar, int verzamelingGrootte, int setGrootte) {
+    private static void permuteCombis(List<java.util.Set<Integer>> combis, List<Integer> soFar,
+                                      int verzamelingGrootte, int setGrootte) {
         if (soFar.size() == setGrootte) {
-            List<Integer> temp = new ArrayList<>(soFar);
+            java.util.Set<Integer> temp = new HashSet<>(soFar);
             combis.add(temp);
             soFar.clear();
         } else {
             for (int i = soFar.size() == 0 ? 0 : soFar.get(soFar.size() - 1) + 1; i < verzamelingGrootte; i++) {
-                List<Integer> next = new ArrayList<>();
-                next.addAll(soFar);
+                List<Integer> next = new ArrayList<>(soFar);
                 next.add(i);
                 permuteCombis(combis, next, verzamelingGrootte, setGrootte);
             }
