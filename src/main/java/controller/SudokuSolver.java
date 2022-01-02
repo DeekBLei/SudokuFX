@@ -183,7 +183,7 @@ public class SudokuSolver {
     private void saveSet(List<Cell> lineOfCells, List<Cell> blockSet, int mogelijkheid) {
         java.util.Set<Integer> mogelijkheden = new HashSet<>();
         mogelijkheden.add(mogelijkheid);
-        voegSetToeAanLijst(new Set(blockSet, blockSet.size(), mogelijkheden, SetType.BLOCK, lineOfCells));
+        voegSetToeAanLijst(new Set(blockSet, mogelijkheden, SetType.BLOCK, lineOfCells));
     }
 
     private void wisWaardeInCells(List<Cell> cells, int mogelijkheid, List<Cell> excludeList ){
@@ -200,7 +200,7 @@ public class SudokuSolver {
                 for (Cell cell : cellCombi) {
                     waardes.addAll(cell.getMogelijkhedenWaardes());
                     if (waardes.size() == setGrootte) {
-                        voegSetToeAanLijst(new Set(cellCombi, setGrootte, waardes, SetType.NAKED_SET, cells));
+                        voegSetToeAanLijst(new Set(cellCombi, waardes, SetType.NAKED_SET, cells));
                     }
                 }
             }
@@ -250,7 +250,7 @@ public class SudokuSolver {
                 }
             }
             if (totaalCellenInCombi.size() == setGrootte && alleSetsInCombiNotNull) {
-                voegSetToeAanLijst(new Set(totaalCellenInCombi, setGrootte, waardeCombi, SetType.HIDDEN_SET, cells));
+                voegSetToeAanLijst(new Set(totaalCellenInCombi, waardeCombi, SetType.HIDDEN_SET, cells));
                 //   wisWaardeinCellsBehalve(totaalCellenInCombi, waardeCombi);
             }
         }

@@ -11,9 +11,9 @@ public class Set {
 
     private List<Cell> superSet;
 
-    public Set(List<Cell> cellsInSet, int setGrootte, java.util.Set<Integer> waardes, SetType setType, List<Cell> superSet) {
+    public Set(List<Cell> cellsInSet,  java.util.Set<Integer> waardes, SetType setType, List<Cell> superSet) {
         this.cellsInSet = cellsInSet;
-        this.setGrootte = setGrootte;
+
         this.waardes = waardes;
         this.setType = setType;
         this.superSet = superSet;
