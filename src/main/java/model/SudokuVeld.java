@@ -1,17 +1,32 @@
 package model;
 
-import java.util.AbstractList;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SudokuVeld {
     private static final int SUDOKU_VELDGROOTTE = 9;
     public List<List<Cell>> cells = new ArrayList<>();
-
-
+    private Level level;
+     private int id;
     public boolean isOpgelost = false;
     public Box[] boxes = new Box[9];
+
+
+    public Level getLevel() {
+        return level;
+    }
+
+    public void setLevel(Level level) {
+        this.level = level;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public SudokuVeld(int[][] sudokuopgave) {
         for (int cellRow = 0; cellRow < SUDOKU_VELDGROOTTE; cellRow++) {
@@ -47,7 +62,15 @@ public class SudokuVeld {
         }
         return column;
     }
-
+ public String getMatrix(){
+        StringBuilder stringBuilder = new StringBuilder();
+        for (List<Cell> cellRows : cells){
+            for(Cell cell : cellRows){
+                stringBuilder.append(cell.getOplossing());
+            }
+        }
+        return stringBuilder.toString();
+ }
     public List<Cell> geefColumn(int col) {
         List<Cell> column = new ArrayList<>();
         for (List<Cell> row : cells) {

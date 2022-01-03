@@ -41,7 +41,7 @@
       <Button layoutX="349.0" layoutY="931.0" mnemonicParsing="false" onAction="#doVindNakedSets" text="Vind naked sets" />
       <ComboBox fx:id="nakedSetComboBox" layoutX="441.0" layoutY="931.0" onAction="#doMarkeerNakedSet" onMouseDragOver="#doMarkeerNakedSet" prefWidth="150.0" />
       <Button layoutX="399.0" layoutY="966.0" mnemonicParsing="false" onAction="#doVerwerkNakedSet" prefHeight="25.0" prefWidth="107.0" text="verwerk naked set" />
-      <Button layoutY="967.0" mnemonicParsing="false" onAction="#doSolveSudoku" text="Solve Sudoku" />
+<!--      <Button layoutY="967.0" mnemonicParsing="false" onAction="#doSolveSudoku" text="Solve Sudoku" />-->
       <Button layoutY="967.0" mnemonicParsing="false" onAction="#doCheckSudoku" text="Check oplossing" />
       <ComboBox fx:id="blockComboBox" layoutX="203.0" layoutY="929.0" onAction="#doMarkeerBlock" prefWidth="150.0" />
       <Button layoutX="136.0" layoutY="966.0" mnemonicParsing="false" onAction="#doVerWerkBlock" prefHeight="25.0" prefWidth="107.0" text="verwerk block" />

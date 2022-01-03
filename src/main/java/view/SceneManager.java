@@ -1,17 +1,13 @@
 package view;
 
-import controller.*;
+import controller.LoginController;
+import controller.SudokuSolverController;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import model.SudokuOpgave;
 import model.SudokuVeld;
 
-
-import java.io.File;
 import java.io.IOException;
 
 public class SceneManager {
@@ -48,12 +44,11 @@ public class SceneManager {
     }
 
 
-    public void showSudokuSolver(SudokuOpgave sudokuOpgave) {
+    public void showSudokuSolver(SudokuVeld sudokuVeld) {
         FXMLLoader loader = getScene("/view/fxml/SudokuSolverScherm.fxml");
         SudokuSolverController controller = loader.getController();
         primaryStage.setFullScreen(true);
-
-        controller.setup(sudokuOpgave);
+        controller.setup(sudokuVeld);
     }
 
 

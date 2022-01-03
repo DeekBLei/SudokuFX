@@ -1,10 +1,11 @@
 package controller;
 
+import Utility.SudokuInvoerTekstFileView;
 import model.Cell;
 import model.SudokuVeld;
 import java.io.IOException;
 import java.util.Scanner;
-
+@Deprecated
 //Een programma om sudoku's op te lossen
 //P.J.Bleichrodt
 public class SudokuDecodeLauncher {

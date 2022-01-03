@@ -1,9 +1,11 @@
 package database.mysql;
 
-import java.util.ArrayList;
+import model.SudokuVeld;
+
+import java.util.List;
 
 public interface GenericDAO<T> {
-     ArrayList<T> getAll();
+     List<SudokuVeld> getAll();
      T getOneById(int id);
      void storeOne(T type);
 }

@@ -13,5 +13,5 @@
         </font>
     </Label>
     <Button fx:id="pickFile" onAction="#pickFile" text="kies textfile"/>
-    <ListView fx:id="sudokuOpgaves" layoutX="136.0" layoutY="98.0" prefHeight="447.0" prefWidth="325.0"/>
+    <ListView fx:id="sudokuViews" layoutX="136.0" layoutY="98.0" prefHeight="447.0" prefWidth="325.0"/>
 </AnchorPane>

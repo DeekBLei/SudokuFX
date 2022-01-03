@@ -72,8 +72,13 @@
             <version>5.7.1</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.7.30</version>
+        </dependency>
 
-           </dependencies>
+    </dependencies>
 
   <build>
     <resources>
@@ -107,7 +112,7 @@
           </execution>
         </executions>
         <configuration>
-          <mainClass>view.Main</mainClass>
+          <mainClass>view.SudokuLauncher</mainClass>
         </configuration>
       </plugin>
     </plugins>

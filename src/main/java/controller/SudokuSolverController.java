@@ -1,7 +1,6 @@
 package controller;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import Service.Solver.SudokuSolver;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.HPos;
@@ -12,8 +11,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
-import model.*;
-import view.Main;
+import model.Cell;
+import model.Constantes;
+import model.Set;
+import model.SudokuVeld;
+import view.SudokuLauncher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +26,7 @@ public class SudokuSolverController {
 
 
     private SudokuSolver sudokuSolver;
-    private SudokuVeld sudokuVeld;
+
     @FXML
     private AnchorPane anchorPane;
     private List<Label> superSetMarkeeringen;
@@ -38,9 +40,9 @@ public class SudokuSolverController {
 
     private Label[] oplossingenView = new Label[Constantes.NUMBER_OF_FIELS_IN_SUDOKUFIELD];
 
-    public void setup(SudokuOpgave sudokuOpgave) {
-        this.sudokuVeld = new SudokuVeld(sudokuOpgave.getVeld());
-        this.sudokuSolver = new SudokuSolver(sudokuVeld);
+    public void setup(SudokuVeld sudokuVeld) {
+        SudokuLauncher.setSudokuVeld(sudokuVeld);
+        this.sudokuSolver = new SudokuSolver(SudokuLauncher.getSudokuVeld());
         this.superSetMarkeeringen = new ArrayList<>();
         this.sudokuVeldGridPane.setPrefHeight((anchorPane.getHeight() - 300));
         this.sudokuVeldGridPane.setPrefWidth((anchorPane.getHeight() - 300));
@@ -62,14 +64,14 @@ public class SudokuSolverController {
 
     private void updateSudokuVeldView() {
         for (int cellNr = 0; cellNr < oplossingenView.length; cellNr++) {
-            Cell cell = sudokuVeld.getCellByNumber(cellNr);
+            Cell cell = SudokuLauncher.getSudokuVeld().getCellByNumber(cellNr);
             if (cell.isOpgelost()) {
                 oplossingenView[cellNr].setText(String.valueOf(cell.getOplossing()));
             }
         }
         for (int cellNr = 0; cellNr < mogelijkehedenViewArray.length; cellNr++) {
 
-            Cell cell = sudokuVeld.getCellByNumber(cellNr);
+            Cell cell = SudokuLauncher.getSudokuVeld().getCellByNumber(cellNr);
             if (!cell.isOpgelost()) {
                 for (int mogelijkheid = 1; mogelijkheid < mogelijkehedenViewArray[cellNr].length; mogelijkheid++) {
                     if (!cell.heeftMogelijkheid(mogelijkheid)) {
@@ -86,7 +88,7 @@ public class SudokuSolverController {
     private void initializeSudokuVeldView() {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
-                Cell cell = sudokuVeld.cells.get(row).get(col);
+                Cell cell = SudokuLauncher.getSudokuVeld().cells.get(row).get(col);
                 //vul mogelijkheden
                 GridPane mogelijkhedeGridPane = new GridPane();
                 int cellViewNr = col + (row * Constantes.SIZE_OF_SUDOKUFIELD);
@@ -128,23 +130,11 @@ public class SudokuSolverController {
     public void doVindHiddenSets(ActionEvent actionEvent) {
         sudokuSolver.clearHiddenSets();
         hiddenSetComboBox.getItems().clear();
-        for (int i = 0; i < Constantes.SIZE_OF_SUDOKUFIELD; i++) {
-            for (int setGrootte = 1; setGrootte < 5; setGrootte++) {
-                sudokuSolver.vindHiddenSet(sudokuVeld.geefColumn(i), setGrootte);
-                sudokuSolver.vindHiddenSet(sudokuVeld.geefRij(i), setGrootte);
-                sudokuSolver.vindHiddenSet(sudokuVeld.geefBox(i), setGrootte);
-            }
-        }
+        sudokuSolver.vindHiddenSet();
         for (Set set : sudokuSolver.getHiddenSets()) {
             hiddenSetComboBox.getItems().add(set);
             hiddenSetComboBox.getItems().sort((hs, hsOther) -> hs.getSetGrootte() > hsOther.getSetGrootte() ? 1 : 0);
-            hiddenSetComboBox.getSelectionModel().selectedItemProperty().addListener(
-                    new ChangeListener<Set>() {
-                        @Override
-                        public void changed(ObservableValue<? extends Set> observableValue, Set oldSet, Set newSet) {
-                            markeerSet(newSet);
-                        }
-                    });
+            hiddenSetComboBox.getSelectionModel().selectedItemProperty().addListener(m -> markeerSet(set));
         }
 
     }
@@ -191,28 +181,30 @@ public class SudokuSolverController {
     }
 
     public void doGaNaarLoginScherm(ActionEvent actionEvent) {
-        Main.getSceneManager().showLoginScene();
+        SudokuLauncher.getSceneManager().showLoginScene();
     }
 
     public void doVindNakedSets(ActionEvent actionEvent) {
         sudokuSolver.clearNakedSets();
         nakedSetComboBox.getItems().clear();
-
+        sudokuSolver.vindNakedSets();
         for (Set set : sudokuSolver.getNakedSets()) {
             nakedSetComboBox.getItems().add(set);
-            nakedSetComboBox.getItems().sort((hs, hsOther) -> hs.getSetGrootte() > hsOther.getSetGrootte() ? 1 : 0);
+        }
+        nakedSetComboBox.getItems().sort((hs, hsOther) -> hs.getSetGrootte() > hsOther.getSetGrootte() ? 1 : 0);
+    }
+
+    public void doVerWerkBlock() {
+        if (blockComboBox.getItems().size() != 0) {
+            Set set = blockComboBox.getValue();
+            if (set != null) {
+                sudokuSolver.verwerkBlock(set);
+                blockComboBox.getItems().remove(set);
+                updateSudokuVeldView();
+            }
         }
     }
-public void doVerWerkBlock(){
-    if (blockComboBox.getItems().size() != 0) {
-        Set set = blockComboBox.getValue();
-        if (set != null) {
-            sudokuSolver.verwerkBlock(set);
-            blockComboBox.getItems().remove(set);
-            updateSudokuVeldView();
-        }
-    }
-}
+
     public void doVindBlocks() {
         for (Set set : sudokuSolver.getBlocks()) {
             blockComboBox.getItems().add(set);
@@ -242,9 +234,9 @@ public void doVerWerkBlock(){
         }
     }
 
-    public void doSolveSudoku(ActionEvent actionEvent) {
-        sudokuSolver.solveSudoku();
-    }
+    //public void doSolveSudoku(ActionEvent actionEvent) {
+    //  sudokuSolver.solveSudoku();
+    // }
 
     public void doCheckSudoku(ActionEvent actionEvent) {
         if (sudokuSolver.isOplossingCorrect()) {
@@ -252,6 +244,14 @@ public void doVerWerkBlock(){
             for (Label marker : superSetMarkeeringen) {
                 marker.setVisible(true);
             }
+            for (List<Cell> cellRows : SudokuLauncher.getSudokuVeld().cells) {
+                for (Cell cell : cellRows) {
+                    if (cell.isOpgelost()) {
+                        gridpanesMogelijkehedenViewArray[cell.cellnummer].setStyle("-fx-border-color: green; -fx-border-visibility: visible;");
+                    }
+                }
+            }
         }
     }
 }
+

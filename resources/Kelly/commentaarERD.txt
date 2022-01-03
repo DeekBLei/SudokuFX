@@ -1,4 +1,0 @@
-In Projectbeschrijving staat onder 2.3.4 op bladzijde 3:
-Dat we voor alle objecten een surrogaatsleutel INT nodig hebben.
-Dus voor gebruiker, cursus, groep, quiz en vraag.
-We moeten dus nog een id INT toevoegen bij gebruiker, cursus en groep.

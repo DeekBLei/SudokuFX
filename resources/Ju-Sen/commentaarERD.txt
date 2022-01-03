@@ -1,4 +1,0 @@
-- Alle objecten worden verbonden aan de genericDAO en die levert een surrogate
- key op en dat is de PK, dus cursus, groep en gebruiker ook Id INT
-- Moeten we niet iets doen met de taken van de andere rollen? Aparte tabel
-vanuit de gebruiker?

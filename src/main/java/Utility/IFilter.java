@@ -1,4 +1,4 @@
-package controller;
+package Utility;
 
 public interface IFilter<T> {
 

@@ -13,7 +13,6 @@ public class Set {
 
     public Set(List<Cell> cellsInSet,  java.util.Set<Integer> waardes, SetType setType, List<Cell> superSet) {
         this.cellsInSet = cellsInSet;
-
         this.waardes = waardes;
         this.setType = setType;
         this.superSet = superSet;
